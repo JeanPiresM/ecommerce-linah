@@ -27,6 +27,7 @@ const teamMembers = [
     githubUrl: "https://github.com/JeanPiresM",
     linkedinUrl: "https://www.linkedin.com/in/jean-pires-aa4796279/",
   },
+  
   {
     name: "Miguel R Christ  ",
     surname: "Desenvolvedor Front-end",

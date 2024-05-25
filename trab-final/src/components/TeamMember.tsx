@@ -1,6 +1,8 @@
 import React from 'react';
 import { SiGithub, SiLinkedin } from 'react-icons/si';
+
 import { IoLogoLinkedin } from "react-icons/io";
+
 
 
 interface TeamMemberProps {
@@ -23,6 +25,8 @@ const TeamMember: React.FC<TeamMemberProps> = ({ name, surname, photoUrl, github
         </a>
         <a href={linkedinUrl} target="_blank" rel="noopener noreferrer">
         <SiLinkedin  style={styles.link  } />
+
+
        
         </a>
       </div>
