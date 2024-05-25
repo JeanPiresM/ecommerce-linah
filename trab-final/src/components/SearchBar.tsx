@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Form, FormControl, Button } from 'react-bootstrap';
 import axios from 'axios';
+import { listarProdutos } from '../services/productServices';
+import ProdType from '../Types/TipoProdutos';
 
 interface Product {
   id: number;
@@ -11,8 +13,8 @@ interface Product {
 }
 
 const SearchBar: React.FC = () => {
-  const [posts, setPosts] = useState<Product[]>([]);
-  const [postsFiltrados, setPostsFiltrados] = useState<Product[]>([]);
+  const [produtos, setProdutos] = useState<ProdType[] | undefined>([]);
+  const [produtosFiltrados, setProdutosFiltrados] = useState<ProdType[] | undefined>([]);
   const [query, setQuery] = useState<string>('');
 
   useEffect(() => {
@@ -21,10 +23,10 @@ const SearchBar: React.FC = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get("https://6647cb172bb946cf2f9ee3c5.mockapi.io/posts");
-      console.log('Fetched data:', response.data);
-      setPosts(response.data);
-      setPostsFiltrados(response.data);
+      const response = await listarProdutos()
+      console.log('Fetched data:', response);
+      setProdutos(response);
+      setProdutosFiltrados(response);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -35,24 +37,24 @@ const SearchBar: React.FC = () => {
     setQuery(value);
 
     // Filtrando os itens conforme o usuário digita
-    const filtrado = posts.filter(item => 
-      item.name && item.name.toLowerCase().includes(value)
+    const filtrado = produtos?.filter(item => 
+      item.nomeProd && item.nomeProd.toLowerCase().includes(value)
     );
 
     console.log('Filtered data on input change:', filtrado);
 
-    setPostsFiltrados(filtrado);
+    setProdutosFiltrados(filtrado);
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const filtrado = posts.filter(item => 
-      item.name && item.name.toLowerCase().includes(query)
+    const filtrado = produtos?.filter(item => 
+      item.nomeProd && item.nomeProd.toLowerCase().includes(query)
     );
 
     console.log('Filtered data on submit:', filtrado);
 
-    setPostsFiltrados(filtrado);
+    setProdutosFiltrados(filtrado);
   };
 
   return (
@@ -69,12 +71,12 @@ const SearchBar: React.FC = () => {
         <Button variant="outline-success" type="submit">Search</Button>
       </Form>
       <div>
-        {postsFiltrados.map(item => (
+        {produtosFiltrados?.map(item => (
           <div key={item.id}>
-            <h3>{item.name}</h3>
-            <p>{item.description}</p>
-            <p>{item.price}</p>
-            <img src={item.imageUrl} alt={item.name} width="100" />
+            <h3>{item.nomeProd}</h3>
+            <p>{item.descricao}</p>
+            <p>{item.preco}</p>
+            <img src={item.img} alt={item.nomeProd} width="100" />
           </div>
         ))}
       </div>

@@ -21,10 +21,11 @@ const Carrinho = () => {
                 ))}
             </ul>
             <button onClick={() => criarProduto({
-                descricao: "",
-                img: "",
-                nomeProd: "",
-                preco: 0
+    nomeProd: "Camiseta Dark Dragon and Blue Monster",
+    descricao: "Utilizamos na confecção de nossas camisetas meia malha 100% algodão fio 30 penteada. Estampamos cada uma a mão, usando tinta a base de água, garantindo maior qualidade e durabilidade para você!",
+    preco: 109.90,
+    img: "https://acdn.mitiendanube.com/stores/001/078/806/products/1-2dc7c8d02c279d5c7517163372345620-1024-1024.webp"
+    
             })}>produto</button>
         </div>
     )

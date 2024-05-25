@@ -41,8 +41,7 @@ const ProductList: React.FC = () => {
             <Card.Img variant="top" src={produto.img} />
             <Card.Body>
               <Card.Title>{produto.nomeProd}</Card.Title>
-              <Card.Text>${produto.preco}</Card.Text>
-
+              <Card.Text>R${produto.preco}</Card.Text>
               <Button variant="primary" onClick={() => addToCart(produto)}>Add to Cart</Button>
             </Card.Body>
           </Card>
