@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useState } from 'react';
 import ProdType from '../Types/TipoProdutos';
 
 // Definição do tipo para um item do carrinho
@@ -27,7 +27,7 @@ export const CartProvider  = ({ children }: CartContextProviderProps) => {
 
     const addToCart = (item: ProdType) => {
         setCart([...cart, item]);
-        console.log("ITEM: ", item)
+            console.log("ITEM: ", item)
     };
 
     const removeFromCart = (itemId: string ) => {

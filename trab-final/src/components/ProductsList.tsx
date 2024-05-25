@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
-import axios from 'axios';
 import { Card, Button } from 'react-bootstrap';
 import ProdType from '../Types/TipoProdutos';
 import { listarProdutos } from '../services/productServices';
-import { CartContext } from '../context.tsx/cartContext';
+import { CartContext } from '../context/cartContext';
 
 // interface Product {
 //     id: number;
@@ -31,6 +30,7 @@ const ProductList: React.FC = () => {
 
     fetchProducts();
   }, []);
+
 
   return (
 

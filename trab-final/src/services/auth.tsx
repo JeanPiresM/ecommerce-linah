@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const API_KEY = import.meta.env.VITE_PUBLIC_API_KEY;
-const URL_API = import.meta.env.VITE_PUBLIC_API_URL;
+const API_KEY = import.meta.env.VITE_API_KEY;
+const URL_API = import.meta.env.VITE_API_URL;
 
 const authenticate = async (mode: string, email: string, password: string) => {
   try {
@@ -21,7 +21,7 @@ export const createUser = async (email: string , password: string) => {
   const token = await authenticate("signUp", email, password);
   return token;
 };
-export const login = async (email: string, password: string) => {
+export const signIn = async (email: string, password: string) => {
   const token = await authenticate("signInWithPassword", email, password);
   return token;
   

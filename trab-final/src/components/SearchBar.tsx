@@ -1,16 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Form, FormControl, Button } from 'react-bootstrap';
-import axios from 'axios';
 import { listarProdutos } from '../services/productServices';
 import ProdType from '../Types/TipoProdutos';
 
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  description: string;
-  imageUrl: string;
-}
+
 
 const SearchBar: React.FC = () => {
   const [produtos, setProdutos] = useState<ProdType[] | undefined>([]);

@@ -1,20 +1,24 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Container} from 'react-bootstrap';
-import { login } from '../context.tsx/auth';
+// import { AuthCtx } from '../context/authContext';
+import { createUser } from '../services/auth';
+import { criarUsuario } from '../services/usuarioServices';
 
 const Login: React.FC = () => {
-  const [email, setEmail] = useState<string>('');
-  const [senha, setSenha] = useState<string>('');
+  const [email, setEmail] = useState<any>('');
+  const [senha, setSenha] = useState<any>('');
+  const [nome, setNome] = useState<any>('');
+
+// const {login} = useContext(AuthCtx)
 
   return (
     <div className="login-container">
       <Container>
         <form action="onSubmit">
-
           <input type="email" placeholder='email' value={email} onChange={(e) => setEmail(e.target.value)} />
           <input type="text" placeholder='senha' value={senha} onChange={(e) => setSenha(e.target.value)} />
-          <button type='button' onClick={() => login(email, senha)}>enviar</button>
-
+          <input type="text" placeholder='nome' value={nome} onChange={(e) => setNome(e.target.value)} />
+          <button type='button' onClick={() =>  criarUsuario(nome, email)}>enviar</button>
         </form>
       </Container>
     </div>
