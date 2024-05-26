@@ -1,4 +1,5 @@
 import axios from "axios";
+import { criarUsuario } from "./usuarioServices";
 
 const API_KEY = import.meta.env.VITE_API_KEY;
 const URL_API = import.meta.env.VITE_API_URL;
@@ -17,12 +18,18 @@ const authenticate = async (mode: string, email: string, password: string) => {
   }
 };
 
-export const createUser = async (email: string , password: string) => {
+export const createUser = async (email: string , password: string, nome: string) => {
+
+try{
+
   const token = await authenticate("signUp", email, password);
+  criarUsuario(email, nome)
   return token;
+}catch(err){
+  window.alert(`ERRO DE AUTENTICAÇÃO: ${err}`)
 };
+}
 export const signIn = async (email: string, password: string) => {
   const token = await authenticate("signInWithPassword", email, password);
   return token;
-  
 };

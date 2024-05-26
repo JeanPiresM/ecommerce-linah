@@ -3,6 +3,8 @@ import { Card, Button } from 'react-bootstrap';
 import ProdType from '../Types/TipoProdutos';
 import { listarProdutos } from '../services/productServices';
 import { CartContext } from '../context/cartContext';
+import { AuthCtx } from '../context/authContext';
+import { useNavigate } from 'react-router-dom';
 
 // interface Product {
 //     id: number;
@@ -16,6 +18,12 @@ const ProductList: React.FC = () => {
   const [product, setProducts] = useState<ProdType[] | undefined>([]);
 
   const {addToCart} = useContext(CartContext)
+
+  const navigate = useNavigate();
+
+  const authContext = useContext(AuthCtx);
+  const isAuthenticated = authContext ? authContext.isAuthenticated : false;
+  
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -32,6 +40,19 @@ const ProductList: React.FC = () => {
   }, []);
 
 
+
+  const handleAddCarrinho = async(product: ProdType) =>{
+    if(
+      isAuthenticated == true
+    ){
+      addToCart(product)
+    }
+    else{
+      window.alert("Faça login para continuar")
+      navigate("/login")
+    }
+  }
+
   return (
 
     <div className="row">
@@ -42,7 +63,7 @@ const ProductList: React.FC = () => {
             <Card.Body>
               <Card.Title>{produto.nomeProd}</Card.Title>
               <Card.Text>R${produto.preco}</Card.Text>
-              <Button variant="primary" onClick={() => addToCart(produto)}>Add to Cart</Button>
+              <Button variant="primary" onClick={() => handleAddCarrinho(produto)}>Add to Cart</Button>
             </Card.Body>
           </Card>
         </div>

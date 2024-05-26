@@ -1,35 +1,65 @@
-import { useContext } from "react"
-import { CartContext } from "../context/cartContext"
-import { criarProduto } from "../services/productServices"
-
+import React, { useContext, useEffect, useState } from "react";
+import { CartContext } from "../context/cartContext";
+import { AuthCtx } from "../context/authContext";
+import { getIdUsuarioPeloEmail } from "../services/usuarioServices";
+import { obterItensDoCarrinho } from "../services/cartServices";
+import ProdType from "../Types/TipoProdutos";
 
 const Carrinho = () => {
+  const authCtx = useContext(AuthCtx);
+  const { removeFromCart } = useContext(CartContext);
+  const [itensDoCarrinho, setItensDoCarrinho] = useState<ProdType[]>([]);
 
-    const { cart, removeFromCart } = useContext(CartContext)
+  useEffect(() => {
+    const fetchCarrinho = async () => {
+        try {
+            // 1. Verifique se o email está sendo passado corretamente
+            console.log("Email do usuário:", authCtx?.email);
+            
+            const resp = await getIdUsuarioPeloEmail(authCtx?.email);
+            
+            if (resp) {
+                // 2. Verifique se a resposta da API está retornando corretamente
+                console.log("Resposta da API:", resp);
+                
+                if (resp.data) {
+                    // 3. Trate erros de forma adequada
+                    if (resp.data.id) {
+                        // 4. Verifique se o ID do usuário está sendo retornado corretamente
+                        console.log("ID do usuário:", resp.data.id);
+                        
+                        const itensCarrinho = await obterItensDoCarrinho(resp.data.id);
+                        setItensDoCarrinho(itensCarrinho);
+                    } else {
+                        console.error("ID do usuário não encontrado na resposta da API.");
+                    }
+                } else {
+                    console.error("Dados do usuário não encontrados na resposta da API.");
+                }
+            } else {
+                console.error("Resposta da API vazia.");
+            }
+        } catch (error) {
+            // 3. Trate erros de forma adequada
+            console.error('Erro ao buscar itens do carrinho:', error);
+        }
+    };
 
+    fetchCarrinho();
+}, [authCtx?.email]);
 
+  return (
+    <div>
+      <ul>
+        {itensDoCarrinho.map((item, index) => (
+          <li key={index}>
+            {item.nomeProd} - Preço: R$ {item.preco}
+            <button onClick={() => removeFromCart(item.id)}>Remover</button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
 
-
-    return (
-        <div>
-            <ul>
-                {cart.map(item => (
-                    <>
-                    {/*Produtos listados dentro do carrinho*/}
-                        <li key={item.id}>{item.nomeProd}</li>
-                        {/*Botão com uma função vinda do context para remover o item do carrinho*/}
-                        <button onClick={() => removeFromCart(item.id)}>Remover</button>
-                    </>
-                ))}
-            </ul>
-            <button onClick={() => criarProduto({
-                nomeProd: "Camiseta Dark Dragon and Blue Monster",
-                descricao: "Utilizamos na confecção de nossas camisetas meia malha 100% algodão fio 30 penteada. Estampamos cada uma a mão, usando tinta a base de água, garantindo maior qualidade e durabilidade para você!",
-                preco: 109.90,
-                img: "https://acdn.mitiendanube.com/stores/001/078/806/products/1-2dc7c8d02c279d5c7517163372345620-1024-1024.webp"
-
-            })}>produto</button>
-        </div>
-    )
-}
-export default Carrinho
+export default Carrinho;

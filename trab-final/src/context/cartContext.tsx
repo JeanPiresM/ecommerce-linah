@@ -1,7 +1,7 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState, useContext } from 'react';
 import ProdType from '../Types/TipoProdutos';
-
-// Definição do tipo para um item do carrinho
+import { AuthCtx } from './authContext'; // Importe o contexto de autenticação
+import { adicionarProdutoAoCarrinho } from '../services/cartServices';
 
 // Definição do tipo para o contexto do carrinho
 interface CartContextType {
@@ -22,15 +22,27 @@ type CartContextProviderProps = {
 
 
 // Componente Provider do Contexto
-export const CartProvider  = ({ children }: CartContextProviderProps) => {
+export const CartProvider: React.FC<CartContextProviderProps> = ({ children }) => {
     const [cart, setCart] = useState<ProdType[]>([]);
+    const authCtx = useContext(AuthCtx); // Obtém o estado de autenticação
 
     const addToCart = (item: ProdType) => {
+        console.log("Email do usuário:", authCtx?.email);
         setCart([...cart, item]);
-            console.log("ITEM: ", item)
+        if (authCtx?.isAuthenticated) {
+            if (authCtx.email) {
+                adicionarProdutoAoCarrinho(authCtx.email, item)
+                console.log("ITEM: ", item);
+            } else {
+                console.log("O email do usuário está indefinido ou nulo.");
+            }
+        } else {
+            console.log("Usuário não autenticado. O produto não foi adicionado ao carrinho.");
+        }
     };
+    
 
-    const removeFromCart = (itemId: string ) => {
+    const removeFromCart = (itemId: string) => {
         const updatedCart = cart.filter(item => item.id !== itemId);
         setCart(updatedCart);
     };
@@ -41,6 +53,3 @@ export const CartProvider  = ({ children }: CartContextProviderProps) => {
         </CartContext.Provider>
     );
 };
-
-// Hook para utilizar o contexto
-export default CartProvider;
