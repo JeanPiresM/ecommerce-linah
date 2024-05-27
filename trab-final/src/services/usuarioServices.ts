@@ -8,6 +8,7 @@ export const criarUsuario = async (emailUser: string, nome: string) => {
             nome: nome,
             email: emailUser,
             carrinho: {
+                msg: 'carrinho',
                 produtos: [],
             },
         });
@@ -15,6 +16,7 @@ export const criarUsuario = async (emailUser: string, nome: string) => {
             nome: nome,
             email: emailUser,
             carrinho: {
+                msg: 'carrinho',
                 produtos: [],
             },
         });

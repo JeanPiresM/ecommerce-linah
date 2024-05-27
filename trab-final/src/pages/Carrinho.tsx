@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { CartContext } from "../context/cartContext";
 import { AuthCtx } from "../context/authContext";
 import { getIdUsuarioPeloEmail } from "../services/usuarioServices";
@@ -10,53 +10,59 @@ const Carrinho = () => {
   const { removeFromCart } = useContext(CartContext);
   const [itensDoCarrinho, setItensDoCarrinho] = useState<ProdType[]>([]);
 
-  useEffect(() => {
-    const fetchCarrinho = async () => {
-        try {
-            // 1. Verifique se o email está sendo passado corretamente
-            console.log("Email do usuário:", authCtx?.email);
-            
-            const resp = await getIdUsuarioPeloEmail(authCtx?.email);
-            
-            if (resp) {
-                // 2. Verifique se a resposta da API está retornando corretamente
-                console.log("Resposta da API:", resp);
-                
-                if (resp.data) {
-                    // 3. Trate erros de forma adequada
-                    if (resp.data.id) {
-                        // 4. Verifique se o ID do usuário está sendo retornado corretamente
-                        console.log("ID do usuário:", resp.data.id);
-                        
-                        const itensCarrinho = await obterItensDoCarrinho(resp.data.id);
-                        setItensDoCarrinho(itensCarrinho);
-                    } else {
-                        console.error("ID do usuário não encontrado na resposta da API.");
-                    }
-                } else {
-                    console.error("Dados do usuário não encontrados na resposta da API.");
-                }
-            } else {
-                console.error("Resposta da API vazia.");
-            }
-        } catch (error) {
-            // 3. Trate erros de forma adequada
-            console.error('Erro ao buscar itens do carrinho:', error);
-        }
-    };
 
+  
+
+    const fetchCarrinho = async () => {
+      let itensTeste;
+
+      try {
+        const userId = await getIdUsuarioPeloEmail(authCtx?.email);
+
+        if (userId) {
+          const itensCarrinho = await obterItensDoCarrinho(userId);
+
+          itensTeste = itensCarrinho;
+
+          console.log("TESTE COM VARIAVEL NORMAL: ", itensTeste)
+
+
+          if (itensCarrinho && Array.isArray(itensCarrinho)) {
+            setItensDoCarrinho(itensCarrinho);
+          } else {
+            console.error("Nenhum item encontrado no carrinho:", itensCarrinho);
+          }
+        } else {
+          console.error("ID do usuário não encontrado.");
+        }
+      } catch (error) {
+        console.error('Erro ao buscar itens do carrinho:', error);
+      }
+    };
+useEffect(() => {
+  if (authCtx?.email) {
     fetchCarrinho();
-}, [authCtx?.email]);
+  }
+}, [])
+ 
+
+
+
 
   return (
     <div>
+      <h2>Carrinho de Compras</h2>
       <ul>
-        {itensDoCarrinho.map((item, index) => (
-          <li key={index}>
-            {item.nomeProd} - Preço: R$ {item.preco}
-            <button onClick={() => removeFromCart(item.id)}>Remover</button>
-          </li>
-        ))}
+        {itensDoCarrinho.length > 0 ? (
+          itensDoCarrinho.map((item, index) => (
+            <li key={index}>
+              {item.nomeProd} - Preço: R$ {item.preco}
+              <button onClick={() => removeFromCart(item.id)}>Remover</button>
+            </li>
+          ))
+        ) : (
+          <p>O carrinho está vazio.</p>
+        )}
       </ul>
     </div>
   );

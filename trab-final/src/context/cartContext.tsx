@@ -1,7 +1,8 @@
 import React, { createContext, useState, useContext } from 'react';
 import ProdType from '../Types/TipoProdutos';
 import { AuthCtx } from './authContext'; // Importe o contexto de autenticação
-import { adicionarProdutoAoCarrinho } from '../services/cartServices';
+import { adicionarProdutoAoCarrinho, removerItemDoCarrinho } from '../services/cartServices';
+import { getIdUsuarioPeloEmail } from '../services/usuarioServices';
 
 // Definição do tipo para o contexto do carrinho
 interface CartContextType {
@@ -42,8 +43,10 @@ export const CartProvider: React.FC<CartContextProviderProps> = ({ children }) =
     };
     
 
-    const removeFromCart = (itemId: string) => {
+    const removeFromCart = async(itemId: string) => {
         const updatedCart = cart.filter(item => item.id !== itemId);
+        const idPeloEmail = await getIdUsuarioPeloEmail(authCtx?.email)
+        removerItemDoCarrinho(idPeloEmail,itemId)
         setCart(updatedCart);
     };
 
