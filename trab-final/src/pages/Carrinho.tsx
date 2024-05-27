@@ -1,21 +1,67 @@
-import { useContext } from "react"
+import { useContext, useEffect, useState } from "react"
 import { CartContext } from "../context.tsx/cartContext"
 // import { criarProduto } from "../services/productServices"
 import { Button, Card } from "react-bootstrap"
+import { obterItensDoCarrinho } from "../services/cartServices"
+import { getIdUsuarioPeloEmail } from "../services/userServices"
+import ProdType from "../Types/TipoProdutos"
+import { AuthCtx } from "../context.tsx/authContext"
 
 
 const Carrinho = () => {
 
     const { cart, removeFromCart } = useContext(CartContext)
 
+    const authCtx = useContext(AuthCtx);
 
+    const [itensDoCarrinho, setItensDoCarrinho] = useState<ProdType[]>([]);
+  
+  
+    
+  
+      const fetchCarrinho = async () => {
+        let itensTeste;
+  
+        try {
+          const userId = await getIdUsuarioPeloEmail(authCtx?.email);
+  
+          if (userId) {
+            const itensCarrinho = await obterItensDoCarrinho(userId);
+  
+            itensTeste = itensCarrinho;
+  
+            console.log("TESTE COM VARIAVEL NORMAL: ", itensTeste)
+  
+  
+            if (itensCarrinho && Array.isArray(itensCarrinho)) {
+              setItensDoCarrinho(itensCarrinho);
+            } else {
+              console.error("Nenhum item encontrado no carrinho:", itensCarrinho);
+            }
+          } else {
+            console.error("ID do usuário não encontrado.");
+          }
+        } catch (error) {
+          console.error('Erro ao buscar itens do carrinho:', error);
+        }
+      };
+  useEffect(() => {
+    if (authCtx?.email) {
+      fetchCarrinho();
+    }
+  }, [])
+   
+  
+  
+  
+  
 
 
     return (
 
         <div style={{ marginTop: 100 }}>
         <div className="container" >
-          {cart.map(item => (
+          {itensDoCarrinho.map(item => (
             <div className="card mb-3" style={{ maxWidth: '450px', margin: '0 auto', backgroundColor: '#0B0B0F', borderColor: '#933FFE', borderRadius: 10, color: 'white' }} key={item.id}>
               <div className="row g-0">
                 <div className="col-md-4">

@@ -1,80 +1,85 @@
-import { api } from "./api";
 import ProdType from "../Types/TipoProdutos";
+import { api } from "./api";
 
-// Método para criar um carrinho para o usuário
-export const criarCarrinho = async (idUsuario: string) => {
-  try {
-    // Envia uma requisição POST para criar o carrinho para o usuário
-    const response = await api.post(`/usuarios/${idUsuario}/carrinho.json`, {});
-    
-    // Retorna o ID do carrinho criado
-    return response.data.idCarrinho;
-  } catch (err) {
-    // Em caso de erro, exibe e lança o erro
-    console.error("Erro ao criar carrinho:", err);
-    throw err;
-  }
-};
+export const adicionarProdutoAoCarrinho = async (emailUser: string | null, produto: ProdType) => {
+    try {
+      // Substitui pontos por sublinhados para usar como chave
+      const chave = emailUser?.replace(/\./g, '_');
+  
+      // Consulta o ID associado ao e-mail no nó emailToId
+      const idResponse = await api.get(`/emailToId/${chave}.json`);
+      const userId = idResponse.data;
+  
+      if (!userId) {
+        console.log("Nenhum ID encontrado para o e-mail fornecido.");
+        return;
+      }
+  
+      // Recupera os dados do usuário pelo userId
+      const userResponse = await api.get(`/users/${userId}.json`);
+      const user = userResponse.data;
+  
+      if (user && user.carrinho) {
+        // Adiciona o novo produto ao array de produtos do carrinho
+        const novosProdutos = user.carrinho.produtos ? [...user.carrinho.produtos, produto] : [produto];
+  
+        // Atualiza o campo 'carrinho.produtos' no documento do usuário
+        await api.patch(`/users/${userId}/carrinho.json`, { produtos: novosProdutos });
+        console.log("Produto adicionado ao carrinho:", novosProdutos);
+      } else {
+        console.log("Carrinho não encontrado para o usuário.");
+      }
+    } catch (err) {
+      console.log("ERRO AO ADICIONAR PRODUTO AO CARRINHO: ", err);
+    }
+  };
+  
 
-// Método para adicionar um produto ao carrinho do usuário
-export const adicionarProdutoAoCarrinho = async (idCarrinho: string, idProduto: string, quantidade: number) => {
+ // Função para obter os itens do carrinho do usuário
+export const obterItensDoCarrinho = async (userId: string) => {
   try {
-    // Envia uma requisição POST para adicionar o produto ao carrinho
-    await api.post(`/carrinhos/${idCarrinho}/produtos`, {
-      idProduto,
-      quantidade
-    });
-  } catch (err) {
-    // Em caso de erro, exibe e lança o erro
-    console.error("Erro ao adicionar produto ao carrinho:", err);
-    throw err;
-  }
-};
+      const response = await api.get(`/users/${userId}/carrinho/produtos.json`);
+      console.log('Resposta da API ao obter itens do carrinho:', response); // Log completo da resposta da API
+      console.log('Status da resposta:', response.status); // Log do status da resposta
+      console.log('Cabeçalhos da resposta:', response.headers); // Log dos cabeçalhos da resposta
 
-// Método para obter os produtos do carrinho do usuário
-export const getCarrinho = async (idUsuario: string, idCarrinho: string): Promise<ProdType[]> => {
-  try {
-    // Faz uma requisição GET para obter os produtos do carrinho do usuário
-    const response = await api.get(`/usuarios/${idUsuario}/carrinho/${idCarrinho}.json`);
-    
-    // Mapeia os produtos obtidos, garantindo que cada um tenha um ID único
-    const produtos: ProdType[] = Object.keys(response.data).map((key) => ({
-      ...response.data[key],
-      id: key,
-    }));
-    
-    // Retorna os produtos do carrinho
-    return produtos;
+      if (response.data) {
+          const produtos = response.data;
+          console.log('Produtos do carrinho:', produtos); // Log dos produtos do carrinho
+
+          // Verificar se os produtos são um array
+          if (Array.isArray(produtos)) {
+              return produtos;
+          } else {
+              console.error('Os produtos do carrinho não estão em um formato válido:', produtos);
+          }
+      }
+      return [];
   } catch (error) {
-    // Em caso de erro, exibe e lança o erro
-    console.error("Erro ao buscar produtos:", error);
-    throw new Error("Erro ao buscar produtos");
+      console.error('Erro ao obter itens do carrinho:', error); // Log do erro
+      throw error;
   }
 };
 
-// Método para retirar um produto do carrinho do usuário
-export const retirarProdutoDoCarrinho = async (idUsuario: string, idCarrinho: string) => {
+export const removerItemDoCarrinho = async (userId: string, itemId: string) => {
   try {
-    // Envia uma requisição DELETE para remover o carrinho do usuário
-    const response = await api.delete(`usuarios/${idUsuario}/carrinho/${idCarrinho}.json`);
-    console.log(response);
-  } catch (err) {
-    // Em caso de erro, exibe e lança o erro
-    console.log("ERRO: ", err);
-    throw err;
-  }
-};
+    // Obter os itens do carrinho do usuário
+    const itensCarrinho = await obterItensDoCarrinho(userId);
 
-// Método para atualizar a quantidade de um produto no carrinho (não implementado)
-export const atualizarQuantidadeProduto = async (idCarrinho: string, idProduto: string, novaQuantidade: number) => {
-  try {
-    // Envia uma requisição PUT para atualizar a quantidade do produto no carrinho
-    await api.put(`/carrinhos/${idCarrinho}/produtos/${idProduto}`, {
-      quantidade: novaQuantidade
-    });
-  } catch (err) {
-    // Em caso de erro, exibe e lança o erro
-    console.log("ERRO: ", err);
-    throw err;
+    // Verificar se o array de itens do carrinho existe e não está vazio
+    if (itensCarrinho && itensCarrinho.length > 0) {
+      // Filtrar o array de itens, removendo o item com o ID especificado
+      const novosItensCarrinho = itensCarrinho.filter(item => item.id !== itemId);
+
+      // Atualizar o campo 'carrinho.produtos' no documento do usuário com os novos itens
+      await api.patch(`/users/${userId}/carrinho.json`, { produtos: novosItensCarrinho });
+
+      console.log("Item removido do carrinho:", itemId);
+    } else {
+      console.error("Nenhum item encontrado no carrinho ou carrinho não encontrado.");
+    }
+  } catch (error) {
+    console.error("Erro ao remover item do carrinho:", error);
+    throw error;
   }
 };

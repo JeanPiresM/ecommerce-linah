@@ -1,15 +1,32 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
+import { createUser } from '../context.tsx/auth';
+import { useNavigate } from 'react-router-dom';
 
 const SignUp: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [nome, setNome] = useState('');
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    // Aqui você pode adicionar a lógica para enviar os dados de cadastro para o servidor
-    console.log('Email:', email);
-    console.log('Password:', password);
+const navigate = useNavigate()
+
+
+  const handleSubmit = async(event: React.FormEvent<HTMLFormElement>) => {
+    try {
+      event.preventDefault();
+      // Aqui você pode adicionar a lógica para enviar os dados de cadastro para o servidor
+    const func =  await createUser(email, password, nome);
+      console.log("Email:", email);
+      console.log(func)
+      console.log("Password:", password);
+      alert("Cadastrado com sucesso!")
+      navigate("/login");
+      setNome('')
+      setEmail('')
+      setPassword('')
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -20,6 +37,15 @@ const SignUp: React.FC = () => {
             <div className="register-form">
               <h2 style={{textAlign:"center", color: 'white', fontSize: 60, fontWeight: 'bold', marginTop: 100}} className="text-center mb-4">Cadastro</h2>
               <Form onSubmit={handleSubmit}>
+              <Form.Group style={{marginBottom: 20, marginTop: 100}} controlId="formBasicName">
+                  <Form.Control
+                    type="text"
+                    placeholder="Nome do usuário"
+                    value={nome}
+                    onChange={(e) => setNome(e.target.value)}
+                    className="mb-3"
+                  />
+                </Form.Group>
                 <Form.Group style={{marginBottom: 20, marginTop: 100}} controlId="formBasicEmail">
                   <Form.Control
                     type="email"
