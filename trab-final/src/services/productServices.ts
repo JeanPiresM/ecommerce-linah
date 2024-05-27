@@ -16,14 +16,8 @@ export const criarProduto = async (produto: Omit<ProdType, 'id'>) => { // Remove
 // Método para listar todos os produtos
 export const listarProdutos = async () => {
   try {
-    const produtos: ProdType[] =  [{
-      id: '',
-      nomeProd: '',
-      descricao: '',
-      preco: 0,
-      img: '',
-    }];
-    ;
+    const produtos: ProdType[] = [];
+
     // Faz uma requisição GET para a API, obtendo todos os produtos
     const response = await api.get(`/products.json`);
 
@@ -44,7 +38,7 @@ export const listarProdutos = async () => {
 
 
 // Método para obter um produto específico por ID
-export const pegarProdutoPorId = async (productId: string) => {
+export const pegarProdutoPorId = async (productId: string | undefined) => {
   try {
     // Faz uma requisição GET para a API, obtendo os dados do produto com base no productId
     const response = await api.get(`/products/${productId}.json`);
@@ -56,15 +50,30 @@ export const pegarProdutoPorId = async (productId: string) => {
   }
 };
 
-export const deletarProduto = async(productId: string) => {
+export const deletarProduto = async (productId: string) => {
 
-try{
-  const response = await api.delete(`/products/${productId}.json`)
+  try {
+    const response = await api.delete(`/products/${productId}.json`)
 
-console.log("DELETADO COM SUCESSO: ", response)
-}catch(err){
-  console.log("ERRO: ",err )
+    console.log("DELETADO COM SUCESSO: ", response)
+  } catch (err) {
+    console.log("ERRO: ", err)
+  }
+
+
 }
 
-
-}
+export const editarProduto = async (
+  id: string,
+ produto: Omit<ProdType, 'id'>
+) => {
+  try {
+    // Faz uma requisição PUT para a API, atualizando os dados do produto com base no ID
+    const resp = await api.put(`/products/${id}.json`, {
+      produto
+    });
+  } catch (err) {
+    // Em caso de erro, loga a mensagem de erro
+    console.log("ERRO: " + err);
+  }
+};

@@ -1,32 +1,55 @@
-import UserType from '../Types/TipoUsuario';
-import { api } from './api'
+// userService.ts
+import { api } from "./api";
 
-export const criarUsuario = async (dadosUsuario: UserType) => {
-  try {
-    // Enviar requisição POST para criar o usuário
-    const response = await api.post('/usuarios', dadosUsuario);
 
-    // Extrair e retornar o ID do usuário criado a partir da resposta da API
-    const idUsuario = response.data.id;
+export const criarUsuario = async (emailUser: string, nome: string) => {
+    try {
+        const response = await api.post("/users.json", {
+            nome: nome,
+            email: emailUser,
+            carrinho: {
+                msg: 'carrinho',
+                produtos: [],
+            },
+        });
+        console.log("Objeto enviado para a criação do usuário:", {
+            nome: nome,
+            email: emailUser,
+            carrinho: {
+                msg: 'carrinho',
+                produtos: [],
+            },
+        });
+        
+        const id = response.data.name;
+        
+        // Salvar o ID do usuário no nó emailToId
+        const emailToId: any = {};
+        const chave = emailUser.replace(/\./g, "_");
+        emailToId[chave] = id;
+        await api.patch("/emailToId.json", emailToId);
 
-    return idUsuario;
-  } catch (err) {
-    // Se houver algum erro na requisição, você pode tratar aqui
-    console.error("Erro ao criar usuário:", err);
-    throw err; // Lançar o erro para ser tratado em algum outro lugar
-  }
+        return id;
+    } catch (err) {
+        console.log("ERRO: ", err);
+        throw err;
+    }
 };
 
 
+// Função para obter o ID do usuário pelo email na coleção emailToId
+export const getIdUsuarioPeloEmail = async (email: string | null | undefined) => {
+    try {
+        // Substituir os pontos por sublinhados para formar a chave na coleção emailToId
+        const chave = email?.replace(/\./g, "_");
 
-// Método para obter um produto específico por ID
-export const pegarPorId = async (userId: string) => {
-  try {
-    // Faz uma requisição GET para a API, obtendo os dados do produto com base no userId
-    const resp = await api.get(`/usuarios/${userId}.json`);
-    return resp.data; // Retorna os dados do produto
-  } catch (err) {
-    // Em caso de erro, loga a mensagem de erro
-    console.log("ERRO: ", err);
-  }
+        // Fazer a requisição GET para obter o ID do usuário associado ao email
+        const response = await api.get(`/emailToId/${chave}.json`);
+
+        // Retornar o ID do usuário da resposta
+        return response.data;
+    } catch (error) {
+        console.error('Erro ao obter o ID do usuário pelo email:', error);
+        throw error;
+    }
 };
