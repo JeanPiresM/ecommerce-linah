@@ -1,27 +1,23 @@
 import React, { useState, useEffect, useContext } from 'react';
-import axios from 'axios';
 import { Card, Button } from 'react-bootstrap';
 import ProdType from '../Types/TipoProdutos';
 import { listarProdutos } from '../services/productServices';
 import { CartContext } from '../context.tsx/cartContext';
 
-// interface Product {
-//     id: number;
-//     name: string;
-//     price: number;
-//     description: string;
-//     imageUrl: string;
-//   }
+interface ProductListProps {
+  query: string;
+}
+
+const ProductList: React.FC<ProductListProps> = ({query}) => {
+  const [products, setProducts] = useState<ProdType[] | undefined>([]);
   
-const ProductList: React.FC = () => {
-  const [product, setProducts] = useState<ProdType[] | undefined>([]);
+  const filteredProducts = products?.filter( item => item.nomeProd.toLowerCase().includes(query))
 
   const {addToCart} = useContext(CartContext)
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        // const response = await axios.get<ProdType[]>('https://66501409ec9b4a4a60309c15.mockapi.io/produtos');
         const response = await listarProdutos()
         setProducts(response);
       } catch (error) {
@@ -35,15 +31,17 @@ const ProductList: React.FC = () => {
   return (
 
     <div className="row">
-      {product?.map(produto=> (
+      {filteredProducts?.map(produto=> (
         <div key={produto.id} className="col-lg-4 col-md-6 mb-4">
           <Card>
             <Card.Img variant="top" src={produto.img} />
             <Card.Body>
               <Card.Title>{produto.nomeProd}</Card.Title>
               <Card.Text>${produto.preco}</Card.Text>
-
-              <Button variant="primary" onClick={() => addToCart(produto)}>Add to Cart</Button>
+              <div  className="d-flex">
+              <Button style={{color: 'white', borderColor: '#933FFE', backgroundColor: '#933FFE'}} variant="primary"  className="mx-2"  onClick={() => addToCart(produto)}>Add to Cart</Button>
+              <Button style={{color: 'white', borderColor: '#933FFE', backgroundColor: '#933FFE'}}variant="secondary"  className="mx-2"  onClick={() => addToCart(produto)}>Details</Button>
+              </div>
             </Card.Body>
           </Card>
         </div>

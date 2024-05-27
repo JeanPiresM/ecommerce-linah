@@ -1,63 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { Form, FormControl, Button } from 'react-bootstrap';
-import axios from 'axios';
+import React, { useState } from 'react';
+import { Form, FormControl } from 'react-bootstrap';
 
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  description: string;
-  imageUrl: string;
+
+interface SearchBarProps {
+  onSearch: (value: string) => void;
 }
 
-const SearchBar: React.FC = () => {
-  const [posts, setPosts] = useState<Product[]>([]);
-  const [postsFiltrados, setPostsFiltrados] = useState<Product[]>([]);
+const SearchBar: React.FC<SearchBarProps> = ({onSearch}) => {
   const [query, setQuery] = useState<string>('');
-
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  const fetchProducts = async () => {
-    try {
-      const response = await axios.get("https://6647cb172bb946cf2f9ee3c5.mockapi.io/posts");
-      console.log('Fetched data:', response.data);
-      setPosts(response.data);
-      setPostsFiltrados(response.data);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.toLowerCase();
     setQuery(value);
-
-    // Filtrando os itens conforme o usuário digita
-    const filtrado = posts.filter(item => 
-      item.name && item.name.toLowerCase().includes(value)
-    );
-
-    console.log('Filtered data on input change:', filtrado);
-
-    setPostsFiltrados(filtrado);
-  };
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const filtrado = posts.filter(item => 
-      item.name && item.name.toLowerCase().includes(query)
-    );
-
-    console.log('Filtered data on submit:', filtrado);
-
-    setPostsFiltrados(filtrado);
+    onSearch(value);
   };
 
   return (
     <div>
-      <Form className="d-flex" onSubmit={handleSubmit}>
+      <Form className="d-flex">
         <FormControl
           type="search"
           placeholder="Faça sua busca"
@@ -66,18 +26,7 @@ const SearchBar: React.FC = () => {
           value={query}
           onChange={handleInputChange}
         />
-        <Button variant="outline-success" type="submit">Search</Button>
       </Form>
-      <div>
-        {postsFiltrados.map(item => (
-          <div key={item.id}>
-            <h3>{item.name}</h3>
-            <p>{item.description}</p>
-            <p>{item.price}</p>
-            <img src={item.imageUrl} alt={item.name} width="100" />
-          </div>
-        ))}
-      </div>
     </div>
   );
 };
