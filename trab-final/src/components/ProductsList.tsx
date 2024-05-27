@@ -3,6 +3,7 @@ import { Card, Button } from 'react-bootstrap';
 import ProdType from '../Types/TipoProdutos';
 import { listarProdutos } from '../services/productServices';
 import { CartContext } from '../context.tsx/cartContext';
+import { Link } from 'react-router-dom';
 
 interface ProductListProps {
   query: string;
@@ -28,19 +29,25 @@ const ProductList: React.FC<ProductListProps> = ({query}) => {
     fetchProducts();
   }, []);
 
+  
+
   return (
 
-    <div className="row">
+    <div style={{backgroundColor: '#0B0B0F', marginLeft: 150,  marginRight: 150, marginTop: 60}} className="row">
       {filteredProducts?.map(produto=> (
-        <div key={produto.id} className="col-lg-4 col-md-6 mb-4">
-          <Card>
-            <Card.Img variant="top" src={produto.img} />
-            <Card.Body>
-              <Card.Title>{produto.nomeProd}</Card.Title>
-              <Card.Text>${produto.preco}</Card.Text>
-              <div  className="d-flex">
-              <Button style={{color: 'white', borderColor: '#933FFE', backgroundColor: '#933FFE'}} variant="primary"  className="mx-2"  onClick={() => addToCart(produto)}>Add to Cart</Button>
-              <Button style={{color: 'white', borderColor: '#933FFE', backgroundColor: '#933FFE'}}variant="secondary"  className="mx-2"  onClick={() => addToCart(produto)}>Details</Button>
+        <div key={produto.id} className="col-lg-3 col-md-10 mb-4">
+          <Card style={{backgroundColor: '#0B0B0F', borderColor: 'white', borderRadius: 10}}>
+            <Card.Img  variant="top" src={produto.img} />
+            <Card.Body style={{color: 'white'}}>
+              <Card.Title style={{fontSize: 22, marginTop: 20}}>{produto.nomeProd}</Card.Title>
+              <Card.Text style={{fontSize: 28, fontWeight: 'bold'}}>R${produto.preco}</Card.Text>
+              <div style={{gap: 10}} className="d-grid">
+                
+              <Button style={{color: 'white', borderColor: '#933FFE', backgroundColor: '#933FFE', fontWeight: 'bold'}} variant="primary"  onClick={() => addToCart(produto)}>Adicionar ao carrinho</Button>
+
+              <Link to={`/details/${produto.id}`} className="d-grid">
+              <Button style={{color: 'white', borderColor: '#898CA9', backgroundColor: '#898CA9', fontWeight: 'bold'}} variant="secondary">Detalhes do produto</Button>
+              </Link>
               </div>
             </Card.Body>
           </Card>
