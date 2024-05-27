@@ -1,27 +1,24 @@
 import React, { useState, useEffect, useContext } from 'react';
-import axios from 'axios';
 import { Card, Button } from 'react-bootstrap';
 import ProdType from '../Types/TipoProdutos';
 import { listarProdutos } from '../services/productServices';
 import { CartContext } from '../context.tsx/cartContext';
+import { Link } from 'react-router-dom';
 
-// interface Product {
-//     id: number;
-//     name: string;
-//     price: number;
-//     description: string;
-//     imageUrl: string;
-//   }
+interface ProductListProps {
+  query: string;
+}
+
+const ProductList: React.FC<ProductListProps> = ({query}) => {
+  const [products, setProducts] = useState<ProdType[] | undefined>([]);
   
-const ProductList: React.FC = () => {
-  const [product, setProducts] = useState<ProdType[] | undefined>([]);
+  const filteredProducts = products?.filter( item => item.nomeProd.toLowerCase().includes(query))
 
   const {addToCart} = useContext(CartContext)
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        // const response = await axios.get<ProdType[]>('https://66501409ec9b4a4a60309c15.mockapi.io/produtos');
         const response = await listarProdutos()
         setProducts(response);
       } catch (error) {
@@ -32,18 +29,26 @@ const ProductList: React.FC = () => {
     fetchProducts();
   }, []);
 
+  
+
   return (
 
-    <div className="row">
-      {product?.map(produto=> (
-        <div key={produto.id} className="col-lg-4 col-md-6 mb-4">
-          <Card>
-            <Card.Img variant="top" src={produto.img} />
-            <Card.Body>
-              <Card.Title>{produto.nomeProd}</Card.Title>
-              <Card.Text>${produto.preco}</Card.Text>
+    <div style={{backgroundColor: '#0B0B0F', marginLeft: 150,  marginRight: 150, marginTop: 60}} className="row">
+      {filteredProducts?.map(produto=> (
+        <div key={produto.id} className="col-lg-3 col-md-10 mb-4">
+          <Card style={{backgroundColor: '#0B0B0F', borderColor: 'white', borderRadius: 10}}>
+            <Card.Img  variant="top" src={produto.img} />
+            <Card.Body style={{color: 'white'}}>
+              <Card.Title style={{fontSize: 22, marginTop: 20}}>{produto.nomeProd}</Card.Title>
+              <Card.Text style={{fontSize: 28, fontWeight: 'bold'}}>R${produto.preco}</Card.Text>
+              <div style={{gap: 10}} className="d-grid">
+                
+              <Button style={{color: 'white', borderColor: '#933FFE', backgroundColor: '#933FFE', fontWeight: 'bold'}} variant="primary"  onClick={() => addToCart(produto)}>Adicionar ao carrinho</Button>
 
-              <Button variant="primary" onClick={() => addToCart(produto)}>Add to Cart</Button>
+              <Link to={`/details/${produto.id}`} className="d-grid">
+              <Button style={{color: 'white', borderColor: '#898CA9', backgroundColor: '#898CA9', fontWeight: 'bold'}} variant="secondary">Detalhes do produto</Button>
+              </Link>
+              </div>
             </Card.Body>
           </Card>
         </div>

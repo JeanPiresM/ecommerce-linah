@@ -16,14 +16,8 @@ export const criarProduto = async (produto: Omit<ProdType, 'id'>) => { // Remove
 // Método para listar todos os produtos
 export const listarProdutos = async () => {
   try {
-    const produtos: ProdType[] =  [{
-      id: '',
-      nomeProd: '',
-      descricao: '',
-      preco: 0,
-      img: '',
-    }];
-    ;
+    const produtos: ProdType[] =  [];
+    
     // Faz uma requisição GET para a API, obtendo todos os produtos
     const response = await api.get(`/products.json`);
 
